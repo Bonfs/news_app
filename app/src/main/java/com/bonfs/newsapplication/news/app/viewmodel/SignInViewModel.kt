@@ -37,6 +37,8 @@ class SignInViewModel: ViewModel() {
                 is ResponseResult.Error -> TODO()
                 is ResponseResult.Success ->
                     Log.d("signIn", response.responseData.getResult(UserDTO::class.java).firstName)
+
+                else -> TODO()
             }
         }
     }
