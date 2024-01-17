@@ -26,7 +26,7 @@ internal class SessionRepositoryTest {
     @Test
     fun `when sign in should return a successful response`() = runTest {
         coEvery { subject.signIn(any(), any()) } returns
-                ResponseResultStatus.Success(NewsModel(user))
+                ResponseResultStatus.Success(user)
 
         val response = subject.signIn("", "")
 

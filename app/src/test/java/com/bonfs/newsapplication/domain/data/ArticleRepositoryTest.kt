@@ -28,7 +28,7 @@ class ArticleRepositoryTest {
         when (response) {
             is ResponseResultStatus.Error -> {}
             is ResponseResultStatus.Success -> {
-                val articles = response.data.getResult(List::class.java) as List<ArticleDTO>
+                val articles = response.data
                 println(articles[0].author)
             }
         }

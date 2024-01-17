@@ -9,6 +9,7 @@ import com.bonfs.newsapplication.news.data.model.UserDTO
 import com.bonfs.newsapplication.news.data.repository.RemoteSessionRepository
 import com.bonfs.newsapplication.news.domain.model.ResponseResultStatus
 import com.bonfs.newsapplication.news.domain.usecase.SignInUseCase
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class SignInViewModel: ViewModel() {
@@ -29,14 +30,14 @@ class SignInViewModel: ViewModel() {
     }
 
     fun signIn() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             when(val response = signInUseCase.execute(
                 email.value ?: "",
                 password.value ?: ""
             )) {
                 is ResponseResultStatus.Error -> TODO()
                 is ResponseResultStatus.Success ->
-                    Log.d("signIn", response.data.getResult(UserDTO::class.java).firstName)
+                    Log.d("signIn", response.data.firstName)
 
                 else -> TODO()
             }

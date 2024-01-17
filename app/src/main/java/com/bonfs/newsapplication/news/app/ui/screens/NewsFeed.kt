@@ -52,6 +52,7 @@ import java.io.IOException
 import java.io.InputStream
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import com.bonfs.newsapplication.news.data.model.ArticleDTO
@@ -68,9 +69,11 @@ fun NewsFeedScreen() {
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     val newsFeedViewModel: NewsFeedViewModel = viewModel()
-    newsFeedViewModel.fetchArticles(getLocalArticle(context)!!)
-    Log.d("NewsFeedScreen", newsFeedViewModel.articles.value.toString())
     val articles by newsFeedViewModel.articles.observeAsState()
+
+    LaunchedEffect(Dispatchers.IO) {
+        newsFeedViewModel.fetchArticles(getLocalArticle(context)!!)
+    }
 
     Scaffold(
         topBar = {
@@ -107,8 +110,6 @@ fun NewsFeedScreen() {
         }
     }
 }
-
-suspend fun aaa() {}
 
 @Composable
 private fun FeedCardItem(article: ArticleDTO) {
