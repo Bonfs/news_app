@@ -4,12 +4,11 @@ import com.bonfs.newsapplication.news.data.model.UserDTO
 import com.bonfs.newsapplication.news.data.repository.RemoteSessionRepository
 import com.bonfs.newsapplication.news.domain.model.ErrorStatus
 import com.bonfs.newsapplication.news.domain.model.NewsModel
-import com.bonfs.newsapplication.news.domain.model.ResponseResult
+import com.bonfs.newsapplication.news.domain.model.ResponseResultStatus
 import com.bonfs.newsapplication.news.domain.repository.SessionRepository
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -27,20 +26,20 @@ internal class SessionRepositoryTest {
     @Test
     fun `when sign in should return a successful response`() = runTest {
         coEvery { subject.signIn(any(), any()) } returns
-                ResponseResult.Success(NewsModel(user))
+                ResponseResultStatus.Success(NewsModel(user))
 
         val response = subject.signIn("", "")
 
-        assert(response is ResponseResult.Success)
+        assert(response is ResponseResultStatus.Success)
     }
 
     @Test
     fun `when sign in error should return a error response`() = runTest {
         coEvery { subject.signIn(any(), any()) } returns
-                ResponseResult.Error(ErrorStatus.NetworkError(Exception()))
+                ResponseResultStatus.Error(ErrorStatus.NetworkError(Exception()))
 
         val response = subject.signIn("", "")
 
-        assert(response is ResponseResult.Error)
+        assert(response is ResponseResultStatus.Error)
     }
 }

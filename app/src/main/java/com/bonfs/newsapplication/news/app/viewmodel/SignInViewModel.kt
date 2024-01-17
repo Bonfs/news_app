@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bonfs.newsapplication.news.data.model.UserDTO
 import com.bonfs.newsapplication.news.data.repository.RemoteSessionRepository
-import com.bonfs.newsapplication.news.domain.model.ResponseResult
+import com.bonfs.newsapplication.news.domain.model.ResponseResultStatus
 import com.bonfs.newsapplication.news.domain.usecase.SignInUseCase
 import kotlinx.coroutines.launch
 
@@ -34,9 +34,9 @@ class SignInViewModel: ViewModel() {
                 email.value ?: "",
                 password.value ?: ""
             )) {
-                is ResponseResult.Error -> TODO()
-                is ResponseResult.Success ->
-                    Log.d("signIn", response.responseData.getResult(UserDTO::class.java).firstName)
+                is ResponseResultStatus.Error -> TODO()
+                is ResponseResultStatus.Success ->
+                    Log.d("signIn", response.data.getResult(UserDTO::class.java).firstName)
 
                 else -> TODO()
             }
