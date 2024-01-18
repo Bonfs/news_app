@@ -25,7 +25,7 @@ internal class SignInUseCaseTest {
 
     @Test
     fun `when execute correct should return success response`() = runTest {
-        coEvery { subject.execute(any(), any()) } returns ResponseResultStatus.Success(user)
+        coEvery { subject.execute(any(), any()) } returns ResponseResultStatus.Success(user.toDomain())
 
         val response = subject.execute("", "")
 

@@ -5,8 +5,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.bonfs.newsapplication.news.data.model.ArticleDTO
 import com.bonfs.newsapplication.news.data.repository.LocalArticleRepository
+import com.bonfs.newsapplication.news.domain.model.Article
 import com.bonfs.newsapplication.news.domain.model.ResponseResultStatus
 import com.bonfs.newsapplication.news.domain.repository.ArticleRepository
 import com.bonfs.newsapplication.news.domain.usecase.FetchArticlesUseCase
@@ -18,8 +18,8 @@ class NewsFeedViewModel: ViewModel() {
     private val fetchArticlesUseCase = FetchArticlesUseCase(articleRepository)
     private val loadNetworkImageUseCase = LoadNetworkImageUseCase(articleRepository)
 
-    private val _articles = MutableLiveData<List<ArticleDTO>>()
-    val articles: LiveData<List<ArticleDTO>> get() = _articles
+    private val _articles = MutableLiveData<List<Article>>()
+    val articles: LiveData<List<Article>> get() = _articles
 
     fun fetchArticles(subject: String) {
         viewModelScope.launch {

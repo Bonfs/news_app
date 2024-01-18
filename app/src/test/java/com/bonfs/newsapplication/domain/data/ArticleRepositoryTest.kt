@@ -36,6 +36,11 @@ class ArticleRepositoryTest {
         assert(response is ResponseResultStatus.Success)
     }
 
+    @Test
+    fun `when fetch article image should return a successful response`() = runTest {
+
+    }
+
     private fun loadJSONFromAsset(): String? {
         var json: String? = null
         json = try {
