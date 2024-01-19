@@ -2,10 +2,8 @@ package com.bonfs.newsapplication.news.app.ui.screens
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.util.Log
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,7 +18,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
@@ -59,6 +56,7 @@ import com.bonfs.newsapplication.news.app.viewmodel.NewsFeedViewModel
 import com.bonfs.newsapplication.news.domain.model.Article
 import com.bonfs.newsapplication.news.domain.model.Source
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import java.io.IOException
 import java.io.InputStream
 
@@ -177,14 +175,16 @@ fun ArticleImage(urlImage: String, modifier: Modifier = Modifier) {
     var isLoading by remember {
         mutableStateOf(true)
     }
-    var bmp: Bitmap? by remember {
+    var articleImage: Bitmap? by remember {
         mutableStateOf(null)
     }
 
     LaunchedEffect(Dispatchers.IO) {
-        bmp = newsFeedViewModel.retrieveArticleImage(urlImage) {
-            isLoading = false
+        val downloadArticleImgJob = async {
+            newsFeedViewModel.retrieveArticleImage(urlImage)
         }
+        articleImage = downloadArticleImgJob.await()
+        isLoading = false
     }
 
     Box(
@@ -202,12 +202,12 @@ fun ArticleImage(urlImage: String, modifier: Modifier = Modifier) {
             )
         }
         
-        if(bmp == null) {
+        if(articleImage == null) {
             return Text(text = "NO IMAGE")
         }
 
         Image(
-            bitmap = bmp!!.asImageBitmap(),
+            bitmap = articleImage!!.asImageBitmap(),
             contentDescription = "",
             contentScale = ContentScale.FillBounds,
             modifier = Modifier.fillMaxWidth()

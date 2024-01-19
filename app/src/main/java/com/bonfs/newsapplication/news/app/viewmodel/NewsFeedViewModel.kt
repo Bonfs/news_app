@@ -25,32 +25,16 @@ class NewsFeedViewModel: ViewModel() {
     fun fetchArticles(subject: String) {
         viewModelScope.launch {
             when(val response = fetchArticlesUseCase.execute(subject)) {
-                is ResponseResultStatus.Error -> {
-                    _articles.value = emptyList()
-                }
-                is ResponseResultStatus.Success -> {
-                    _articles.value = response.data
-                }
-
-                else -> {}
+                is ResponseResultStatus.Error -> _articles.value = emptyList()
+                is ResponseResultStatus.Success -> _articles.value = response.data
             }
         }
     }
 
-    suspend fun retrieveArticleImage(url: String, onComplete: () -> Unit): Bitmap? {
+    suspend fun retrieveArticleImage(url: String): Bitmap? {
         return when(val response = loadNetworkImageUseCase.execute(url)) {
-            is ResponseResultStatus.Error -> {
-                onComplete()
-                null
-            }
-            is ResponseResultStatus.Success -> {
-                onComplete()
-                response.data
-            }
-            else -> {
-                onComplete()
-                null
-            }
+            is ResponseResultStatus.Error -> null
+            is ResponseResultStatus.Success -> response.data
         }
     }
 }

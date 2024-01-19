@@ -8,7 +8,6 @@ import kotlinx.coroutines.withContext
 
 class LoadNetworkImageUseCase(val repository: ArticleRepository) {
     suspend fun execute(url: String): ResponseResultStatus<Bitmap> = withContext(Dispatchers.IO) {
-        Thread.sleep(1_000)
         repository.loadImage(url)
     }
 }
