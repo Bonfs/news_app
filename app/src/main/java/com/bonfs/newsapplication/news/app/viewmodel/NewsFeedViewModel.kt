@@ -12,6 +12,7 @@ import com.bonfs.newsapplication.news.domain.repository.ArticleRepository
 import com.bonfs.newsapplication.news.domain.usecase.FetchArticlesUseCase
 import com.bonfs.newsapplication.news.domain.usecase.LoadNetworkImageUseCase
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.async
 
 class NewsFeedViewModel: ViewModel() {
     private val articleRepository: ArticleRepository = LocalArticleRepository()
@@ -30,19 +31,26 @@ class NewsFeedViewModel: ViewModel() {
                 is ResponseResultStatus.Success -> {
                     _articles.value = response.data
                 }
+
+                else -> {}
             }
         }
     }
 
-    fun retrieveArticleImage(url: String): Bitmap? {
-        var articleImage: Bitmap? = null
-        viewModelScope.launch {
-            articleImage = when(val response = loadNetworkImageUseCase.execute(url)) {
-                is ResponseResultStatus.Error -> null
-                is ResponseResultStatus.Success -> response.data
+    suspend fun retrieveArticleImage(url: String, onComplete: () -> Unit): Bitmap? {
+        return when(val response = loadNetworkImageUseCase.execute(url)) {
+            is ResponseResultStatus.Error -> {
+                onComplete()
+                null
+            }
+            is ResponseResultStatus.Success -> {
+                onComplete()
+                response.data
+            }
+            else -> {
+                onComplete()
+                null
             }
         }
-
-        return articleImage
     }
 }
