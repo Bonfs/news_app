@@ -38,8 +38,6 @@ class SignInViewModel: ViewModel() {
                 is ResponseResultStatus.Error -> TODO()
                 is ResponseResultStatus.Success ->
                     Log.d("signIn", response.data.firstName)
-
-                else -> TODO()
             }
         }
     }

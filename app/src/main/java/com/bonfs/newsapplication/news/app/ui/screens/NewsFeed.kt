@@ -15,20 +15,19 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.NonRestartableComposable
@@ -51,6 +50,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.bonfs.newsapplication.news.app.ui.commons.components.NewsTopAbbBar
 import com.bonfs.newsapplication.news.app.ui.theme.NewsApplicationTheme
 import com.bonfs.newsapplication.news.app.viewmodel.NewsFeedViewModel
 import com.bonfs.newsapplication.news.domain.model.Article
@@ -60,53 +60,49 @@ import kotlinx.coroutines.async
 import java.io.IOException
 import java.io.InputStream
 
-
 const val FAVORITE_ANIMATION = "favorite"
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NewsFeedScreen() {
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     val newsFeedViewModel: NewsFeedViewModel = viewModel()
     val articles by newsFeedViewModel.articles.observeAsState()
+    val feedListState = rememberLazyListState()
 
     LaunchedEffect(Dispatchers.IO) {
         newsFeedViewModel.fetchArticles(getLocalArticle(context)!!)
     }
 
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(text = "News") },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                )
-            )
-        }
+        topBar = { NewsTopAbbBar() }
     ) { contentPadding ->
-        Box(modifier = Modifier
-            .padding(
-                top = contentPadding.calculateTopPadding(),
-            )
-            .padding(
-                horizontal = 8.dp
-            )
+        Box(
+            modifier = Modifier
+                .padding(top = contentPadding.calculateTopPadding())
+                .padding(horizontal = 8.dp)
         ) {
-            LazyColumn(
-                contentPadding = PaddingValues(
-                    horizontal = 8.dp,
-                    vertical = 8.dp
-                ),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                if (articles != null) {
-                    items(articles!!) { article ->
-                        FeedCardItem(article)
-                    }
-                }
+            NewsList(articles, feedListState)
+        }
+    }
+}
 
-            }
+@Composable
+private fun NewsList(articles: List<Article>?, state: LazyListState) {
+    if (articles.isNullOrEmpty()) {
+        return Text(text = "EMPTY LIST")
+    }
+
+    LazyColumn(
+        state = state,
+        contentPadding = PaddingValues(
+            horizontal = 8.dp,
+            vertical = 8.dp
+        ),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        items(articles) { article ->
+            FeedCardItem(article)
         }
     }
 }
@@ -128,11 +124,6 @@ private fun FeedCardItem(article: Article) {
             ArticleImage(
                 article.imageURL,
             )
-            /*Box(modifier = Modifier
-                .height(150.dp)
-                .fillMaxWidth()
-                .background(Color.Blue)
-            )*/
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier
@@ -140,29 +131,12 @@ private fun FeedCardItem(article: Article) {
                     .fillMaxHeight()
                     .padding(horizontal = 4.dp, vertical = 2.dp)
             ) {
-                Column(
+                ArticleTitleAndDescription(
+                    title = article.title,
+                    description = article.description,
                     modifier = Modifier.weight(1F)
-                ) {
-                    Text(
-                        text = article.title,
-                        style = TextStyle(
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 10.sp
-                        )
-                    )
-                    Text(
-                        text = article.description,
-                        style = TextStyle(
-                            fontSize = 8.sp,
-                            fontStyle = FontStyle.Italic
-                        )
-                    )
-                }
-                IconToggleButton(checked = isChecked, onCheckedChange = { isChecked = !isChecked }) {
-                    val iconColor = if (isChecked) Color(0xFFEC407A) else Color(0xFFB0BEC5)
-                    val tint by animateColorAsState(iconColor, label = FAVORITE_ANIMATION)
-                    Icon(Icons.Filled.Favorite, contentDescription = "Localized description", tint = tint)
-                }
+                )
+                FavoriteButton(isChecked) { isChecked = it }
             }
         }
     }
@@ -183,6 +157,7 @@ fun ArticleImage(urlImage: String, modifier: Modifier = Modifier) {
         val downloadArticleImgJob = async {
             newsFeedViewModel.retrieveArticleImage(urlImage)
         }
+
         articleImage = downloadArticleImgJob.await()
         isLoading = false
     }
@@ -193,16 +168,16 @@ fun ArticleImage(urlImage: String, modifier: Modifier = Modifier) {
             .height(150.dp)
             .fillMaxWidth(),
 
-    ) {
-        if(isLoading) {
+        ) {
+        if (isLoading) {
             return CircularProgressIndicator(
                 modifier = Modifier.width(64.dp),
                 color = MaterialTheme.colorScheme.secondary,
                 trackColor = MaterialTheme.colorScheme.surfaceVariant,
             )
         }
-        
-        if(articleImage == null) {
+
+        if (articleImage == null) {
             return Text(text = "NO IMAGE")
         }
 
@@ -211,6 +186,44 @@ fun ArticleImage(urlImage: String, modifier: Modifier = Modifier) {
             contentDescription = "",
             contentScale = ContentScale.FillBounds,
             modifier = Modifier.fillMaxWidth()
+        )
+    }
+}
+
+@Composable
+fun ArticleTitleAndDescription(title: String, description: String, modifier: Modifier) {
+    Column(modifier = modifier) {
+        Text(
+            text = title,
+            style = TextStyle(
+                fontWeight = FontWeight.Bold,
+                fontSize = 10.sp
+            )
+        )
+        Text(
+            text = description,
+            style = TextStyle(
+                fontSize = 8.sp,
+                fontStyle = FontStyle.Italic
+            )
+        )
+    }
+}
+
+@Composable
+fun FavoriteButton(
+    isChecked: Boolean,
+    onCheckedChange: (Boolean) -> Unit
+) {
+    IconToggleButton(
+        checked = isChecked,
+        onCheckedChange = { onCheckedChange(it) }) {
+        val iconColor = if (isChecked) Color(0xFFEC407A) else Color(0xFFB0BEC5)
+        val tint by animateColorAsState(iconColor, label = FAVORITE_ANIMATION)
+        Icon(
+            Icons.Filled.Favorite,
+            contentDescription = "Localized description",
+            tint = tint
         )
     }
 }

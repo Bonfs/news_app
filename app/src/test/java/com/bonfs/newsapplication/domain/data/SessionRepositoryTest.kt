@@ -3,7 +3,6 @@ package com.bonfs.newsapplication.domain.data
 import com.bonfs.newsapplication.news.data.model.UserDTO
 import com.bonfs.newsapplication.news.data.repository.RemoteSessionRepository
 import com.bonfs.newsapplication.news.domain.model.ErrorStatus
-import com.bonfs.newsapplication.news.domain.model.NewsModel
 import com.bonfs.newsapplication.news.domain.model.ResponseResultStatus
 import com.bonfs.newsapplication.news.domain.repository.SessionRepository
 import io.mockk.coEvery

@@ -12,7 +12,6 @@ import com.bonfs.newsapplication.news.domain.repository.ArticleRepository
 import com.bonfs.newsapplication.news.domain.usecase.FetchArticlesUseCase
 import com.bonfs.newsapplication.news.domain.usecase.LoadNetworkImageUseCase
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.async
 
 class NewsFeedViewModel: ViewModel() {
     private val articleRepository: ArticleRepository = LocalArticleRepository()
