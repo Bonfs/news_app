@@ -7,4 +7,6 @@ import com.bonfs.newsapplication.news.domain.model.ResponseResultStatus
 interface ArticleRepository {
     suspend fun fetchArticles(subject: String): ResponseResultStatus<List<Article>>
     suspend fun loadImage(url: String): ResponseResultStatus<Bitmap>
+
+    suspend fun getArticleByAuthorName(author: String): ResponseResultStatus<Article>
 }

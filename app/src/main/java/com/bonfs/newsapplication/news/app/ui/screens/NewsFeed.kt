@@ -23,6 +23,7 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.MaterialTheme
@@ -63,7 +64,7 @@ import java.io.InputStream
 const val FAVORITE_ANIMATION = "favorite"
 
 @Composable
-fun NewsFeedScreen() {
+fun NewsFeedScreen(onNavigateToArticle: (String) -> Unit) {
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     val newsFeedViewModel: NewsFeedViewModel = viewModel()
@@ -82,13 +83,17 @@ fun NewsFeedScreen() {
                 .padding(top = contentPadding.calculateTopPadding())
                 .padding(horizontal = 8.dp)
         ) {
-            NewsList(articles, feedListState)
+            NewsList(articles, feedListState) { onNavigateToArticle(it) }
         }
     }
 }
 
 @Composable
-private fun NewsList(articles: List<Article>?, state: LazyListState) {
+private fun NewsList(
+    articles: List<Article>?,
+    state: LazyListState,
+    onNavigateToArticle: (String) -> Unit
+) {
     if (articles.isNullOrEmpty()) {
         return Text(text = "EMPTY LIST")
     }
@@ -102,18 +107,20 @@ private fun NewsList(articles: List<Article>?, state: LazyListState) {
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         items(articles) { article ->
-            FeedCardItem(article)
+            FeedCardItem(article) { onNavigateToArticle(it) }
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun FeedCardItem(article: Article) {
+private fun FeedCardItem(article: Article, onClick: (String) -> Unit) {
     var isChecked by remember { mutableStateOf(false) }
     ElevatedCard(
         elevation = CardDefaults.cardElevation(
             defaultElevation = 6.dp
         ),
+        onClick = { onClick(article.author!!) },
         modifier = Modifier
             .height(200.dp)
             .fillMaxWidth()
@@ -256,8 +263,10 @@ private fun CardPreview() {
             "Donec vulputate augue vel venenatis suscipit. Praesent in maximus mauris.",
             "",
             "",
+            "",
             ""
-        )
+        ),
+        {}
     )
 }
 
@@ -265,6 +274,6 @@ private fun CardPreview() {
 @Composable
 private fun Preview() {
     NewsApplicationTheme {
-        NewsFeedScreen()
+        NewsFeedScreen({})
     }
 }

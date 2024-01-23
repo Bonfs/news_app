@@ -12,11 +12,11 @@ data class ArticleDTO(
     @SerializedName("title")
     val title: String,
     @SerializedName("description")
-    val description: String,
+    val description: String?,
     @SerializedName("url")
-    val url: String,
+    val url: String?,
     @SerializedName("urlToImage")
-    val urlToImage: String,
+    val urlToImage: String?,
     @SerializedName("publishedAt")
     val publishedAt: String,
     @SerializedName("content")
@@ -25,10 +25,11 @@ data class ArticleDTO(
     fun toDomain(): Article {
         return Article(
             source.toDomain(),
-            author,
+            author ?: "",
             title,
-            description,
-            urlToImage,
+            description ?: "",
+            url ?: "",
+            urlToImage ?: "",
             publishedAt,
             content
         )
