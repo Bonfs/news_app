@@ -3,7 +3,6 @@ package com.bonfs.newsapplication
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -19,9 +18,8 @@ import com.bonfs.newsapplication.news.app.ui.commons.ARTICLE_ID_KEY
 import com.bonfs.newsapplication.news.app.ui.screens.ArticleDetail
 import com.bonfs.newsapplication.news.app.ui.screens.NewsFeedScreen
 import com.bonfs.newsapplication.news.app.ui.screens.NewsScreen
-import com.bonfs.newsapplication.news.app.ui.screens.SignInScreen
+import com.bonfs.newsapplication.news.app.ui.screens.sign_in.SignInScreen
 import com.bonfs.newsapplication.news.app.ui.theme.NewsApplicationTheme
-import com.bonfs.newsapplication.news.app.viewmodel.SignInViewModel
 
 class MainActivity : ComponentActivity() {
     private lateinit var navController: NavHostController
