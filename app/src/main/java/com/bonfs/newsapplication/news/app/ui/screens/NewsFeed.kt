@@ -209,6 +209,7 @@ fun ArticleTitleAndDescription(title: String, description: String, modifier: Mod
         )
         Text(
             text = description,
+            maxLines = 2,
             style = TextStyle(
                 fontSize = 8.sp,
                 fontStyle = FontStyle.Italic
