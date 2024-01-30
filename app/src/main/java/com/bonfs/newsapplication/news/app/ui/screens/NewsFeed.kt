@@ -118,9 +118,12 @@ private fun FeedCardItem(article: Article, onClick: (String) -> Unit) {
     var isChecked by remember { mutableStateOf(false) }
     ElevatedCard(
         elevation = CardDefaults.cardElevation(
-            defaultElevation = 6.dp
+            defaultElevation = 1.dp
         ),
-        onClick = { onClick(article.author!!) },
+        onClick = { onClick(article.author) },
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.onPrimary
+        ),
         modifier = Modifier
             .height(200.dp)
             .fillMaxWidth()
