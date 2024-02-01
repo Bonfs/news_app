@@ -12,7 +12,6 @@ import com.bonfs.newsapplication.news.domain.model.ErrorStatus
 import com.bonfs.newsapplication.news.domain.model.ResponseResultStatus
 import com.bonfs.newsapplication.news.domain.repository.ArticleRepository
 import com.google.gson.Gson
-import java.lang.IllegalArgumentException
 import java.net.URL
 import javax.net.ssl.SSLHandshakeException
 
@@ -29,21 +28,32 @@ class LocalArticleRepository: ArticleRepository {
         return ResponseResultStatus.Success(articles)
     }
 
-    fun Sequence<ArticleDTO>.filterByDescriptionNotNull() = filter { it.description != null }
-    fun Sequence<ArticleDTO>.filterByUrlToImageNotNull() = filter { it.urlToImage != null }
-    fun Sequence<ArticleDTO>.filterByUrlNotNull() = filter { it.url != null }
-    fun Sequence<ArticleDTO>.filterByAuthorNotNull() = filter { it.author != null }
+    private fun filterByDescriptionNotNull(sequence: Sequence<ArticleDTO>) =
+        sequence.filter { it.description != null }
+    private fun filterByUrlToImageNotNull(sequence: Sequence<ArticleDTO>) =
+        sequence.filter { it.urlToImage != null }
+    private fun filterByUrlNotNull(sequence: Sequence<ArticleDTO>) =
+        sequence.filter { it.url != null }
+    private fun filterByAuthorNotNull(sequence: Sequence<ArticleDTO>) =
+        sequence.filter { it.author != null }
 
-    fun Sequence<ArticleDTO>.filterArticleWithValidNotNullField(): Sequence<ArticleDTO> {
-        return filterByDescriptionNotNull()
-            .filterByUrlToImageNotNull()
-            .filterByUrlNotNull()
-            .filterByAuthorNotNull()
+    private fun mapValidArticlesDTOAndConvertToArticle(sequence: Sequence<ArticleDTO>) =
+        sequence.map { it.toDomain() }.toList()
+
+    private fun Sequence<ArticleDTO>.mapValidArticlesDTOAndConvertToArticle(): List<Article> {
+        val filterArticleWithValidNotNullField = composeArticleFilter(
+            ::filterByDescriptionNotNull,
+            ::filterByUrlToImageNotNull,
+            ::filterByUrlNotNull,
+            ::filterByAuthorNotNull,
+        )
+
+        return mapValidArticlesDTOAndConvertToArticle(filterArticleWithValidNotNullField(this))
     }
 
-    fun Sequence<ArticleDTO>.mapValidArticlesDTOAndConvertToArticle(): List<Article> {
-        return filterArticleWithValidNotNullField().map { it.toDomain() }.toList()
-    }
+    private fun <T> composeArticleFilter(
+        vararg functions: (Sequence<T>) -> Sequence<T>
+    ): (Sequence<T>) -> Sequence<T> = { functions.fold(it) { acc, f -> f(acc) } }
 
     override suspend fun loadImage(url: String): ResponseResultStatus<Bitmap> {
         if(BitmapCache.existInCache(url)) {
